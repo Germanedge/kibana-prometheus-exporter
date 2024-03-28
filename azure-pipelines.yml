@@ -43,7 +43,10 @@ steps:
   displayName: 'Install Yarn'
 - script: |
     yarn install
-  displayName: 'yarn install'
+  displayName: 'yarn install plugin'
+- script: |
+    yarn --cwd ../elastic/kibana/ install
+  displayName: 'yarn install kibana'
 - script: |
     yarn build 
   displayName: 'yarn build'
