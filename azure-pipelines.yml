@@ -2,11 +2,11 @@ variables:
   - group: Github-credentials
   - group: npm-config-artifactory
   - group: jira-e1platform
-  - name: plugin-name
+  - name: pluginName
     value: "kibana-prometheus-exporter"  # name of the plugin
   
-name: "$(imageName) $(GitVersion.FullSemVer)"
-  
+name: "$(pluginName)"
+
 resources:
   repositories:
     - repository: kibana
@@ -22,6 +22,7 @@ steps:
 - checkout: self
   fetchDepth: 0
   path: s
+  persistCredentials: true
 - checkout: kibana
   fetchDepth: 0
   path: elastic/kibana
@@ -30,7 +31,7 @@ steps:
     version: '16.x'
   displayName: 'Install Node.js'
 - script:  |
-    if ! [ -f ".npmrc" ]; then |
+    if ! [ -f ".npmrc" ]; then
       echo registry=$npm_config_registry > .npmrc && 
       echo _auth=$npm_config_auth >> .npmrc &&
       echo always-auth=$npm_config_always_auth >> .npmrc &
@@ -42,18 +43,18 @@ steps:
   displayName: 'Install Yarn'
 - script: |
     yarn install
-  displayName: 'npm install'
+  displayName: 'yarn install'
 - script: |
     yarn build 
-  displayName: 'Build the plugin'
-- script: |  
-    set -e
-    git config --global user.email "git@germanedge.com"
-    git config --global user.name "Continuous Integration"  
-  displayName: 'git config'
-  name: set_git_config
-#- script: |
-#    kibana_release=$(jq -r ".version" package.json)
-#    git tag $kibana_release
-#    git push --tags
-#  displayName: 'git add release tag'
+  displayName: 'yarn build'
+#- script: |  
+#    set -e
+#    git config --global user.email "git@germanedge.com"
+#    git config --global user.name "Continuous Integration"  
+#  displayName: 'git config'
+#  name: set_git_config
+- script: |
+    kibana_release=$(jq -r ".version" package.json)
+    git tag $kibana_release
+    git push --tags
+  displayName: 'git add release tag'
