@@ -1,0 +1,27 @@
+{
+    "name": "kibana-prometheus-exporter",
+    "jsonversion": "4",
+    "servicetype": "core",
+    "ge_domain": "platform",
+    "description": "Elastic Kibana Plugin for exporting prometheus metrics",
+    "homepage": "https://github.com/germanedge/kibana-prometheus-exporter",
+    "keywords": [
+      "elastic",
+      "kibana",
+      "plugin",
+      "node",
+      "prometheus-metrics"
+    ],
+    "author": "Ferdinand Ritter <ferdinand.ritter@orsoft.de>",
+    "contributors": [],
+    "repository": {
+      "type": "docker",
+      "url": "germanedge-docker.artifactory.new-solutions.com/edge-one/"
+    },
+    "entrypoint": "entrypoint.sh",
+    "dockerfile": "Dockerfile",
+    "version": "1.5.0",
+    "profiles": {},
+    "base_images": []
+  }
+  

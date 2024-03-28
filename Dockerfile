@@ -1,12 +1,28 @@
-ARG STACK_VERSION
+# build stage
+FROM germanedge-docker.artifactory.new-solutions.com/edge-one/ge-ubuntu-node:0.32.0 as upstream
 
-# https://github.com/elastic/kibana-docker
-# See https://hub.docker.com/_/kibana/tags
-# or https://hub.docker.com/r/elastic/kibana/tags for official version
-FROM kibana:${STACK_VERSION}
+USER root
 
-ARG STACK_VERSION
+ARG npm_config_registry
+ARG npm_config_auth
+ARG npm_config_always_auth
+ARG npm_config_email
 
-# Installs Prometheus Exporter plugin
-# https://github.com/pjhampton/kibana-prometheus-exporter
-RUN bin/kibana-plugin install https://github.com/pjhampton/kibana-prometheus-exporter/releases/download/${STACK_VERSION}/prometheus_exporter-${STACK_VERSION}.zip
+COPY . /app
+
+RUN if ! [ -f ".npmrc" ]; then \
+      echo registry=$npm_config_registry > .npmrc && \
+      echo _auth=$npm_config_auth >> .npmrc && \
+      echo always-auth=$npm_config_always_auth >> .npmrc && \
+      echo email=$npm_config_email >> .npmrc; \
+    fi
+RUN yarn install
+#RUN yarn lint
+RUN yarn build
+RUN rm -f .npmrc
+
+FROM ubuntu:22.04
+
+RUN mkdir /kibana-plugin
+
+COPY --from=upstream /app/target/prometheus_exporter-${STACK_VERSION}.zip /kibana-plugin/prometheus-exporter.zip

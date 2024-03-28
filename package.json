@@ -1,12 +1,12 @@
 {
-  "name": "kibanaPrometheusExporter",
-  "version": "8.11.3",
+  "name": "kibana-prometheus-exporter",
+  "version": "8.12.2",
   "private": true,
   "scripts": {
     "build": "yarn plugin-helpers build",
     "clean": "rm -rf build node_modules checksum.json",
-    "plugin-helpers": "node ../../scripts/plugin_helpers",
-    "kbn": "node ../../scripts/kbn",
+    "plugin-helpers": "node ../../elastic/kibana/scripts/plugins_helpers",
+    "kbn": "node ../../elastic/kibana/scripts/kbn",
     "test": "npx jest --coverage"
   },
   "devDependencies": {
