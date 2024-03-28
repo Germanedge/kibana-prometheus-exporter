@@ -1,34 +1,59 @@
 variables:
   - group: Github-credentials
-  - group: artifactory-docker
+  - group: npm-config-artifactory
   - group: jira-e1platform
-  - name: imageName
-    value: "kibana-prometheus-exporter"  # name of the image
+  - name: plugin-name
+    value: "kibana-prometheus-exporter"  # name of the plugin
   
 name: "$(imageName) $(GitVersion.FullSemVer)"
   
 resources:
   repositories:
-    - repository: templates
-      type: github
-      name: Germanedge/azure-pipelines-templates
-      endpoint: Germanedge
-      ref: 'refs/heads/GE4-15356/pre-post-build-steps'
     - repository: kibana
       type: github
       name: elastic/kibana
       endpoint: Germanedge
       ref: 'refs/heads/8.12'
 
-extends:
-  template: azure-pipelines-docker-template.yml@templates
-  parameters:
-    gitPassword: $(gitPassword)
-    gitUser: $(gitUser)
-    stackDefinitionUpdating: false
-    kubernetesManifestBuilding: true
-    preBuildSteps:
-      - checkout: self
-        path: s
-      - checkout: kibana
-        path: elastic/kibana
+pool:
+  vmImage: "ubuntu-22.04"
+
+steps:
+- checkout: self
+  fetchDepth: 0
+  path: s
+- checkout: kibana
+  fetchDepth: 0
+  path: elastic/kibana
+- task: UseNode@1
+  inputs:
+    version: '16.x'
+  displayName: 'Install Node.js'
+- script:  |
+    if ! [ -f ".npmrc" ]; then |
+      echo registry=$npm_config_registry > .npmrc && 
+      echo _auth=$npm_config_auth >> .npmrc &&
+      echo always-auth=$npm_config_always_auth >> .npmrc &
+      echo email=$npm_config_email >> .npmrc;
+    fi
+  displayName: 'Provide npm login'
+- script: |
+    npm install -g yarn
+  displayName: 'Install Yarn'
+- script: |
+    yarn install
+  displayName: 'npm install'
+- script: |
+    yarn build 
+  displayName: 'Build the plugin'
+- script: |  
+    set -e
+    git config --global user.email "git@germanedge.com"
+    git config --global user.name "Continuous Integration"  
+  displayName: 'git config'
+  name: set_git_config
+#- script: |
+#    kibana_release=$(jq -r ".version" package.json)
+#    git tag $kibana_release
+#    git push --tags
+#  displayName: 'git add release tag'
