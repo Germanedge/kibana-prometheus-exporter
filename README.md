@@ -54,5 +54,9 @@ Details on the various exported metrics are documented on the [pjhampton/kibana-
 
 ## Resources
 
-* https://github.com/pjhampton/kibana-prometheus-exporter
-* https://www.elastic.co/guide/en/kibana/master/development-plugin-resources.html
+| Link | Summary |
+|--------------|-----------|
+|[pjhampton/kibana-prometheus-exporter](https://github.com/pjhampton/kibana-prometheus-exporter) | Forged github repo |
+|[Plugin Resources](https://www.elastic.co/guide/en/kibana/master/development-plugin-resources.html) | Developer docu entrypoint kibana plugins |
+| [Check out multiple repositories in your pipeline](https://learn.microsoft.com/en-us/azure/devops/pipelines/repos/multi-repo-checkout?view=azure-devops#checkout-path) | Azure DevOps usage of multiple repositories docu |
+
