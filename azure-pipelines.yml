@@ -28,5 +28,6 @@ extends:
     stackDefinitionUpdating: false
     kubernetesManifestBuilding: true
     preBuildSteps:
+      - checkout: self
       - checkout: kibana
         path: elastic/kibana
