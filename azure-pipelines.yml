@@ -17,7 +17,7 @@ resources:
     - repository: kibana
       type: github
       name: elastic/kibana
-      endpoint: elastic
+      endpoint: Germanedge
       ref: 'refs/heads/8.12'
 
 extends:
