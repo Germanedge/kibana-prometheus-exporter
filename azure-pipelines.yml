@@ -23,12 +23,15 @@ steps:
   fetchDepth: 0
   path: s
   persistCredentials: true
+- script: | 
+    mkdir -p $(Build.SourcesDirectory)/elastic/kibana
+  displayName: Create elastic/kibana repository folder (workaround)
 - checkout: kibana
   fetchDepth: 0
   path: elastic/kibana
 - task: UseNode@1
   inputs:
-    version: '16.x'
+    version: '18.x'
   displayName: 'Install Node.js'
 - script:  |
     if ! [ -f ".npmrc" ]; then
