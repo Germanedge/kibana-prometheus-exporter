@@ -29,5 +29,6 @@ extends:
     kubernetesManifestBuilding: true
     preBuildSteps:
       - checkout: self
+        path: .
       - checkout: kibana
         path: elastic/kibana
