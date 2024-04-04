@@ -48,11 +48,11 @@ steps:
     yarn install
   displayName: 'yarn install plugin'
 - script: |
-    yarn --cwd s/elastic/kibana/ install
-  displayName: 'yarn install kibana'
+    yarn --cwd elastic/kibana/ kbn bootstrap
+  displayName: 'yarn install kibana dev dependencies'
 - script: |
     ls -la
-    ls -d -1 "$PWD/s/elastic/kibana/scripts/"
+    ls -d -1 "$PWD/elastic/kibana/scripts/"
     yarn build 
   displayName: 'yarn build'
 #- script: |  
