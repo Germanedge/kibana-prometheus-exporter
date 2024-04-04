@@ -28,7 +28,7 @@ steps:
   displayName: Create s/elastic/kibana repository folder (workaround)
 - checkout: kibana
   fetchDepth: 0
-  path: elastic/kibana
+  path: s/elastic/kibana
 - task: UseNode@1
   inputs:
     version: '18.x'
