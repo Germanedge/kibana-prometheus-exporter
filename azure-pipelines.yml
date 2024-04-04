@@ -25,7 +25,7 @@ steps:
   persistCredentials: true
 - script: | 
     mkdir -p $(Build.SourcesDirectory)/elastic/kibana
-  displayName: Create elastic/kibana repository folder (workaround)
+  displayName: Create s/elastic/kibana repository folder (workaround)
 - checkout: kibana
   fetchDepth: 0
   path: elastic/kibana
