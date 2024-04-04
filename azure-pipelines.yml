@@ -4,6 +4,10 @@ variables:
   - group: jira-e1platform
   - name: pluginName
     value: "kibana-prometheus-exporter"  # name of the plugin
+  - name: pluginBaseVersion
+    value: "8.12"
+  - name: pluginPatchVersion
+    value: "2"  # version of the plugin
   
 name: "$(pluginName)"
 
@@ -13,7 +17,7 @@ resources:
       type: github
       name: elastic/kibana
       endpoint: Germanedge
-      ref: 'refs/heads/8.12'
+      ref: 'refs/heads/$(pluginBaseVersion)'
 
 pool:
   vmImage: "ubuntu-22.04"
@@ -24,10 +28,11 @@ steps:
   path: s
 - checkout: self
   fetchDepth: 0
-  path: s/kibana/plugins
+  path: s/plugins/$(pluginName)
   persistCredentials: true
-- script: |
-    nvm use
+- task: UseNode@1
+  inputs:
+    version: '20.x'
   displayName: 'Install Node.js'
 - script:  |
     if ! [ -f ".npmrc" ]; then
