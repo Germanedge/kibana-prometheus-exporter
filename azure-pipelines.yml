@@ -52,7 +52,7 @@ steps:
   displayName: 'yarn install kibana dev dependencies'
 - script: |
     ls -la
-    ls -d -1 "$PWD/elastic/kibana/scripts/"
+    ls -d -1 "$PWD/elastic/kibana/scripts/"*
     yarn build 
   displayName: 'yarn build'
 #- script: |  
