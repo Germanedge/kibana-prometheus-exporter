@@ -48,7 +48,7 @@ steps:
     yarn install
   displayName: 'yarn install plugin'
 - script: |
-    yarn --cwd ../elastic/kibana/ install
+    yarn --cwd s/elastic/kibana/ install
   displayName: 'yarn install kibana'
 - script: |
     yarn build 
