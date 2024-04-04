@@ -19,19 +19,15 @@ pool:
   vmImage: "ubuntu-22.04"
 
 steps:
-- checkout: self
-  fetchDepth: 0
-  path: s
-  persistCredentials: true
-- script: | 
-    mkdir -p $(Build.SourcesDirectory)/elastic/kibana
-  displayName: Create s/elastic/kibana repository folder (workaround)
 - checkout: kibana
   fetchDepth: 0
-  path: s/elastic/kibana
-- task: UseNode@1
-  inputs:
-    version: '20.x'
+  path: s
+- checkout: self
+  fetchDepth: 0
+  path: s/kibana/plugins
+  persistCredentials: true
+- script: |
+    nvm use
   displayName: 'Install Node.js'
 - script:  |
     if ! [ -f ".npmrc" ]; then
@@ -43,18 +39,15 @@ steps:
   displayName: 'Provide npm login'
 - script: |
     npm install -g yarn
-  displayName: 'Install Yarn'
+  displayName: 'Install yarn'
 - script: |
+    yarn kbn bootstrap
+  displayName: 'Bootstrap kibana'
+- script: |
+    cd plugins/$(pluginName)
     yarn install
-  displayName: 'yarn install plugin'
-- script: |
-    yarn --cwd elastic/kibana/ kbn bootstrap
-  displayName: 'yarn install kibana dev dependencies'
-- script: |
-    ls -la
-    ls -d -1 "$PWD/elastic/kibana/scripts/"*
-    yarn build 
-  displayName: 'yarn build'
+    yarn build
+  displayName: 'Build plugin'
 #- script: |  
 #    set -e
 #    git config --global user.email "git@germanedge.com"
