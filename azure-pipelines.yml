@@ -51,6 +51,8 @@ steps:
     yarn --cwd s/elastic/kibana/ install
   displayName: 'yarn install kibana'
 - script: |
+    ls -la
+    ls -d -1 "$PWD/s/elastic/kibana/scripts/"
     yarn build 
   displayName: 'yarn build'
 #- script: |  
