@@ -32,7 +32,7 @@ steps:
   persistCredentials: true
 - task: UseNode@1
   inputs:
-    version: '20.x'
+    version: '18.19.1'
   displayName: 'Install Node.js'
 - script:  |
     if ! [ -f ".npmrc" ]; then
@@ -59,6 +59,33 @@ steps:
 #    git config --global user.name "Continuous Integration"  
 #  displayName: 'git config'
 #  name: set_git_config
+- script: |
+    set -e
+    plugin_version = $(pluginBaseVersion).$(pluginPatchVersion)
+    service_version=$(jq -r ".version" service.json)
+    if [[ "$service_version" == "$plugin_version" ]]; 
+    then
+        echo "File service.json contains correct version. Exiting."
+        exit 0            
+    fi
+
+    update_version () {
+      filename=$1
+      new_version=$2
+      filename_tmp='$filename.tmp'
+      echo "##[debug] setting version in $filename to $new_version"
+      jq ".version = \"${new_version}\"" $filename > $filename_tmp
+      mv $filename_tmp $filename
+      git add $filename
+    }
+
+    echo "##[debug] setting version to $plugin_version"
+    update_version service.json $plugin_version
+
+    git commit -m "CI: Set build version to  [+semver: skip]"
+    # set variable to stop build
+    echo "##vso[task.setvariable variable=breakBuild;isOutput=true]true"
+  displayName: Set build version
 - script: |
     kibana_release=$(jq -r ".version" package.json)
     git tag $kibana_release
