@@ -55,6 +55,7 @@ steps:
   name: set_git_config
 - script: |
     set -e
+    cd plugins/$(pluginName)
     service_version=$(jq -r ".version" service.json)
     if [[ "$service_version" == "$(pluginVersion)" ]]; 
     then
@@ -80,6 +81,7 @@ steps:
     git commit -m "CI: Set build version to $(plugin_version) [+semver: skip]"
     # set variable to stop build
     echo "##vso[task.setvariable variable=breakBuild;isOutput=true]true"
+    cd ../..
   displayName: Set build version
 - script: |
     yarn kbn bootstrap
@@ -94,13 +96,14 @@ steps:
     git tag $(pluginVersion)
     git push
   displayName: 'git add release tag and push'
-#– task: GithubRelease@0
-#  inputs:
-#    githubConnection: Germanedge
-#    repositoryName: Germanedge/$(pluginName)
-#  tag: $(pluginVersion)
-#  assets: |
-#    $(PWD)/plugins/kibana-prometheus-exporter/build/checksum.json
-#    $(PWD)/plugins/kibana-prometheus-exporter/build/kibanaPrometheusExporter-$(pluginVersion).zip
-#    $(PWD)/plugins/kibana-prometheus-exporter/build/RELEASE_TEMPLATE.md
-#  displayName: 'Create GitHub Release'
+- task: GithubRelease@1
+  inputs:
+    githubConnection: Germanedge
+    repositoryName: '$(Build.Repository.Name)'
+    action: 'create'
+    tagSource: 'userSpecifiedTag'
+    tag: $(pluginVersion)
+    releaseNotesSource: 'filePath'
+    releaseNotesFilePath : 'CHANGELOG.md'
+    assets: '$(PWD)/plugins/kibana-prometheus-exporter/build/*'
+  displayName: 'Create GitHub Release'
