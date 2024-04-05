@@ -1,0 +1,12 @@
+{
+    "id": "kibanaPrometheusExporter",
+    "version": "8.12.2",
+    "owner": {
+      "name": "https://github.com/germanedge"
+    },
+    "kibanaVersion": "kibana",
+    "server": true,
+    "ui": false,
+    "requiredPlugins": [],
+    "optionalPlugins": []
+  }
