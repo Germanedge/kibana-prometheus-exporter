@@ -9,7 +9,7 @@ variables:
   - name: pluginPatchVersion # patch version of the plugin
     value: ""
   - name: pluginVersion # version of the plugin
-    value: "" # "$(pluginBaseVersion).$(pluginPatchVersion)"
+    value: "" # "$(kibanaBaseVersion).$(pluginPatchVersion)"
   
 name: "$(pluginName)"
 
@@ -19,7 +19,7 @@ resources:
       type: github
       name: elastic/kibana
       endpoint: Germanedge
-      ref: 'refs/heads/$(pluginBaseVersion)'
+      ref: 'refs/heads/$(kibanaBaseVersion)'
 
 pool:
   vmImage: "ubuntu-22.04"
