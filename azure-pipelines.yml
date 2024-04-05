@@ -38,7 +38,7 @@ steps:
     # Parse the Json file and get the values.
     plugin_version=$(cat kibana.json | jq -r '.example.value1')
     # split version to get kibana version and patch level
-    version_parts=(${plugin_version//./ })
+    IFS='.' read -a version_parts <<< "$plugin_version#"
     echo "##[debug] Found ${#version_parts[@]} parts in version"
     if [ ${#version_parts[@]} -ne 3 ]; then
       echo "##[error] Version must have 3 parts, found ${#version_parts[@]}"
