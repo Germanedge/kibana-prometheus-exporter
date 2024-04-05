@@ -40,14 +40,16 @@ steps:
     # split version to get kibana version and patch level
     IFS=. read -a version_parts <<< "$plugin_version"
     echo "##[debug] Found ${#version_parts[@]} parts in version"
-    # if [ ${#version_parts[@]} -ne 3 ]; then
-    #  echo "##[error] Version must have 3 parts, found ${#version_parts[@]}"
-    #  exit 1
-    # fi
+     if [ ${#version_parts[@]} -ne 3 ]; then
+      echo "##[error] Version must have 3 parts, found ${#version_parts[@]}"
+      exit 1
+     fi
+    echo "##[debug] Get plugin version $plugin_version"
     # Set the values as output variables.
     echo "##vso[task.setvariable variable=pluginVersion;isoutput=true]$plugin_version"
-    # echo "##vso[task.setvariable variable=kibanaBaseVersion;isoutput=true]${version_parts[0]}.${version_parts[1]}"
-    # echo "##vso[task.setvariable variable=pluginPatchVersion;isoutput=true]$version_parts[2]"
+    echo "##[debug] Set kibana version to ${version_parts[0]}.${version_parts[1]}"
+    echo "##vso[task.setvariable variable=kibanaBaseVersion;isoutput=true]${version_parts[0]}.${version_parts[1]}"
+    echo "##vso[task.setvariable variable=pluginPatchVersion;isoutput=true]$version_parts[2]"
     cd ../..
   displayName: 'Get Version'
 - task: UseNode@1
@@ -113,6 +115,18 @@ steps:
     git tag $(pluginVersion)
     git push
   displayName: 'git add release tag and push'
+- script: |
+    cd plugins/$(pluginName)
+    # run predefined script
+    ../utils/checksum ./build/*.zip >checksum.json
+    cd ../..
+  displayName: Create checksum manifest
+- script: |
+    cd plugins/$(pluginName)
+    # run predefined script
+    cp ./utils/RELEASE_TEMPLATE.md ./build && ./utils/create_release_template ./build/RELEASE_TEMPLATE.md
+    cd ../..
+  displayName: Create checksum manifest
 - task: GithubRelease@1
   inputs:
     githubConnection: Github EdgeOne
