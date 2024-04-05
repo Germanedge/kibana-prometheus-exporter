@@ -5,9 +5,9 @@ variables:
   - name: pluginName
     value: "kibana-prometheus-exporter"  # name of the plugin
   - name: kibanaBaseVersion # kibana version
-    value: "x.y"
+    value: "8.12"
   - name: pluginPatchVersion # patch version of the plugin
-    value: "z"
+    value: ""
   - name: pluginVersion # version of the plugin
     value: "" # "$(pluginBaseVersion).$(pluginPatchVersion)"
   
