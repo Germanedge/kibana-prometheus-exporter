@@ -4,12 +4,12 @@ variables:
   - group: jira-e1platform
   - name: pluginName
     value: "kibana-prometheus-exporter"  # name of the plugin
-  - name: pluginBaseVersion
-    value: "8.12"
-  - name: pluginPatchVersion
-    value: "2"  # version of the plugin
-  - name: pluginVersion
-    value: "$(pluginBaseVersion).$(pluginPatchVersion)"
+  - name: kibanaBaseVersion # kibana version
+    value: "x.y"
+  - name: pluginPatchVersion # patch version of the plugin
+    value: "z"
+  - name: pluginVersion # version of the plugin
+    value: "" # "$(pluginBaseVersion).$(pluginPatchVersion)"
   
 name: "$(pluginName)"
 
@@ -32,6 +32,24 @@ steps:
   fetchDepth: 0
   path: s/plugins/$(pluginName)
   persistCredentials: true
+- script: |
+    cd plugins/$(pluginName)
+    ls -la
+    # Parse the Json file and get the values.
+    plugin_version=$(cat kibana.json | jq -r '.example.value1')
+    # split version to get kibana version and patch level
+    version_parts=(${plugin_version//./ })
+    echo "##[debug] Found ${#version_parts[@]} parts in version"
+    if [ ${#version_parts[@]} -ne 3 ]; then
+      echo "##[error] Version must have 3 parts, found ${#version_parts[@]}"
+      exit 1
+    fi
+    # Set the values as output variables.
+    echo "##vso[task.setvariable variable=pluginVersion;isoutput=true]$plugin_version"
+    echo "##vso[task.setvariable variable=kibanaBaseVersion;isoutput=true]${version_parts[0]}.${version_parts[1]}"
+    echo "##vso[task.setvariable variable=pluginPatchVersion;isoutput=true]$version_parts[2]"
+    cd ../..
+  displayName: 'Get Version'
 - task: UseNode@1
   inputs:
     version: '18.19.1'
@@ -76,7 +94,6 @@ steps:
     echo "##[debug] setting version to $(plugin_version)"
     update_version service.json $(plugin_version)
     update_version package.json $(plugin_version)
-    update_version kibana.json $(plugin_version)
 
     git commit -m "CI: Set build version to $(plugin_version) [+semver: skip]"
     # set variable to stop build
