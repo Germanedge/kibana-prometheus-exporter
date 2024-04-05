@@ -115,7 +115,7 @@ steps:
   displayName: 'git add release tag and push'
 - task: GithubRelease@1
   inputs:
-    githubConnection: Germanedge
+    githubConnection: Github EdgeOne
     repositoryName: '$(Build.Repository.Name)'
     action: 'create'
     tagSource: 'userSpecifiedTag'
