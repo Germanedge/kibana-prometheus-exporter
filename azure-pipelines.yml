@@ -8,6 +8,8 @@ variables:
     value: "8.12"
   - name: pluginPatchVersion
     value: "2"  # version of the plugin
+  - name: pluginVersion
+    value: "$(pluginBaseVersion).$(pluginPatchVersion)"
   
 name: "$(pluginName)"
 
@@ -45,25 +47,16 @@ steps:
 - script: |
     npm install -g yarn
   displayName: 'Install yarn'
-- script: |
-    yarn kbn bootstrap
-  displayName: 'Bootstrap kibana'
-- script: |
-    cd plugins/$(pluginName)
-    yarn install
-    yarn build
-  displayName: 'Build plugin'
-#- script: |  
-#    set -e
-#    git config --global user.email "git@germanedge.com"
-#    git config --global user.name "Continuous Integration"  
-#  displayName: 'git config'
-#  name: set_git_config
+- script: |  
+    set -e
+    git config --global user.email "git@germanedge.com"
+    git config --global user.name "Continuous Integration"  
+  displayName: 'git config'
+  name: set_git_config
 - script: |
     set -e
-    plugin_version = $(pluginBaseVersion).$(pluginPatchVersion)
     service_version=$(jq -r ".version" service.json)
-    if [[ "$service_version" == "$plugin_version" ]]; 
+    if [[ "$service_version" == "$(pluginVersion)" ]]; 
     then
         echo "File service.json contains correct version. Exiting."
         exit 0            
@@ -79,15 +72,35 @@ steps:
       git add $filename
     }
 
-    echo "##[debug] setting version to $plugin_version"
-    update_version service.json $plugin_version
+    echo "##[debug] setting version to $(plugin_version)"
+    update_version service.json $(plugin_version)
+    update_version package.json $(plugin_version)
+    update_version kibana.json $(plugin_version)
 
-    git commit -m "CI: Set build version to  [+semver: skip]"
+    git commit -m "CI: Set build version to $(plugin_version) [+semver: skip]"
     # set variable to stop build
     echo "##vso[task.setvariable variable=breakBuild;isOutput=true]true"
   displayName: Set build version
 - script: |
-    kibana_release=$(jq -r ".version" package.json)
-    git tag $kibana_release
-    git push --tags
-  displayName: 'git add release tag'
+    yarn kbn bootstrap
+  displayName: 'Bootstrap kibana'
+- script: |
+    cd plugins/$(pluginName)
+    yarn install
+    yarn build
+    cd ../..
+  displayName: 'Build plugin'
+- script: |
+    git tag $(pluginVersion)
+    git push
+  displayName: 'git add release tag and push'
+#– task: GithubRelease@0
+#  inputs:
+#    githubConnection: Germanedge
+#    repositoryName: Germanedge/$(pluginName)
+#  tag: $(pluginVersion)
+#  assets: |
+#    $(PWD)/plugins/kibana-prometheus-exporter/build/checksum.json
+#    $(PWD)/plugins/kibana-prometheus-exporter/build/kibanaPrometheusExporter-$(pluginVersion).zip
+#    $(PWD)/plugins/kibana-prometheus-exporter/build/RELEASE_TEMPLATE.md
+#  displayName: 'Create GitHub Release'
