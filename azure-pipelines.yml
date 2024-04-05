@@ -33,7 +33,6 @@ steps:
   path: s/plugins/$(pluginName)
   persistCredentials: true
 - script: |
-    cd plugins/$(pluginName)
     ls -la
     # Parse the Json file and get the values.
     plugin_version=$(cat kibana.json | jq -r '.version')
@@ -50,8 +49,8 @@ steps:
     echo "##[debug] Set kibana version to ${version_parts[0]}.${version_parts[1]}"
     echo "##vso[task.setvariable variable=kibanaBaseVersion;isoutput=true]${version_parts[0]}.${version_parts[1]}"
     echo "##vso[task.setvariable variable=pluginPatchVersion;isoutput=true]$version_parts[2]"
-    cd ../..
   displayName: 'Get Version'
+  workingDirectory: 's/plugins/$(pluginName)'
 - task: UseNode@1
   inputs:
     version: '18.19.1'
@@ -64,6 +63,7 @@ steps:
       echo email=$npm_config_email >> .npmrc;
     fi
   displayName: 'Provide npm login'
+  workingDirectory: 's/plugins/$(pluginName)'
 - script: |
     npm install -g yarn
   displayName: 'Install yarn'
@@ -72,10 +72,10 @@ steps:
     git config --global user.email "git@germanedge.com"
     git config --global user.name "Continuous Integration"  
   displayName: 'git config'
+  workingDirectory: 's/plugins/$(pluginName)'
   name: set_git_config
 - script: |
     set -e
-    cd plugins/$(pluginName)
     service_version=$(jq -r ".version" service.json)
     if [[ "$service_version" == "$(pluginVersion)" ]]; 
     then
@@ -93,28 +93,28 @@ steps:
       git add $filename
     }
 
-    echo "##[debug] setting version to $(plugin_version)"
-    update_version service.json $(plugin_version)
-    update_version package.json $(plugin_version)
+    echo "##[debug] setting version to $(pluginVersion)"
+    update_version service.json $(pluginVersion)
+    update_version package.json $(pluginVersion)
 
-    git commit -m "CI: Set build version to $(plugin_version) [+semver: skip]"
+    git commit -m "CI: Set build version to $(pluginVersion) [+semver: skip]"
     # set variable to stop build
     echo "##vso[task.setvariable variable=breakBuild;isOutput=true]true"
-    cd ../..
   displayName: Set build version
+  workingDirectory: 's/plugins/$(pluginName)'
 - script: |
     yarn kbn bootstrap
   displayName: 'Bootstrap kibana'
 - script: |
-    cd plugins/$(pluginName)
     yarn install
     yarn build
-    cd ../..
   displayName: 'Build plugin'
+  workingDirectory: 's/plugins/$(pluginName)'
 - script: |
-    git tag $(pluginVersion)
-    git push
+    git tag "v$(pluginVersion)"
+    git push origin
   displayName: 'git add release tag and push'
+  workingDirectory: 's/plugins/$(pluginName)'
 - script: |
     cd plugins/$(pluginName)
     # run predefined script
