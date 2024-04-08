@@ -5,7 +5,7 @@
   "scripts": {
     "build": "yarn plugin-helpers build",
     "clean": "rm -rf build node_modules checksum.json",
-    "plugin-helpers": "node ../../scripts/plugin_helpers --verbose",
+    "plugin-helpers": "node ../../scripts/plugin_helpers --debug --verbose",
     "kbn": "node ../../scripts/kbn",
     "test": "npx jest --coverage"
   },
