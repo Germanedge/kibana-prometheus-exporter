@@ -8,6 +8,8 @@ Forge of [pjhampton/kibana-prometheus-exporter](https://github.com/pjhampton/kib
 
 **Important**: Please don't build off and install from the trunk (master). This is a development / experimental branch so don't be that girl/them/guy, please. The `RELEASE/{NUM}` branches are the release branches. This process is shaped by the Kibana release process.
 
+Basics at [kibana plugin helpers](https://github.com/elastic/kibana/tree/main/packages/kbn-plugin-helpers)
+
 > Needs rework!
 
 First, locate the version you require on the [release page](https://github.com/pjhampton/kibana-prometheus-exporter/releases). There is a couple of ways to install this plugin. The more common approach would be to download the correct version and run:
