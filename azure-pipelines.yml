@@ -110,7 +110,7 @@ steps:
   displayName: 'Build plugin'
   workingDirectory: 'plugins/$(pluginName)'
   env:
-    KIBANA_CI_STATS_CONFIG: {}
+    KIBANA_CI_STATS_CONFIG: '{}'
 - script: |
     git tag "v$(pluginVersion)"
     git push origin
