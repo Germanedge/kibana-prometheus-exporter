@@ -10,6 +10,8 @@ variables:
     value: "2"
   - name: pluginVersion # version of the plugin
     value: "" # "$(kibanaBaseVersion).$(pluginPatchVersion)"
+  - name: draftFlag
+    value: true
   
 name: "$(pluginName)"
 
@@ -98,15 +100,12 @@ steps:
     update_version package.json $(pluginVersion)
 
     git commit -m "CI: Set build version to $(pluginVersion) [+semver: skip]"
-    # set variable to stop build
-    echo "##vso[task.setvariable variable=breakBuild;isOutput=true]true"
   displayName: Set build version
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
     yarn kbn bootstrap
-  displayName: 'Bootstrap kibana'
+  displayName: 'Set up Kibana Development Environment'
 - script: |
-    yarn install
     yarn build
   displayName: 'Build plugin'
   workingDirectory: 'plugins/$(pluginName)'
@@ -116,17 +115,21 @@ steps:
   displayName: 'git add release tag and push'
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
-    cd plugins/$(pluginName)
     # run predefined script
     ../utils/checksum ./build/*.zip >checksum.json
-    cd ../..
   displayName: Create checksum manifest
+  workingDirectory: 'plugins/$(pluginName)'
 - script: |
-    cd plugins/$(pluginName)
     # run predefined script
     cp ./utils/RELEASE_TEMPLATE.md ./build && ./utils/create_release_template ./build/RELEASE_TEMPLATE.md
-    cd ../..
   displayName: Create checksum manifest
+  workingDirectory: 'plugins/$(pluginName)'
+- script: |
+    if  [ $(Build.SourceBranch) == 'develop' ]; then
+      echo "##vso[task.setvariable variable=draftFlag;isOutput=true]false"
+    fi
+  displayName: 'Check if draft release'
+  workingDirectory: 'plugins/$(pluginName)'
 - task: GithubRelease@1
   inputs:
     githubConnection: Github EdgeOne
@@ -137,4 +140,5 @@ steps:
     releaseNotesSource: 'filePath'
     releaseNotesFilePath : 'CHANGELOG.md'
     assets: '$(PWD)/plugins/kibana-prometheus-exporter/build/*'
+    isDraft: $(draftFlag)
   displayName: 'Create GitHub Release'
