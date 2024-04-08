@@ -50,7 +50,7 @@ steps:
     echo "##vso[task.setvariable variable=kibanaBaseVersion;isoutput=true]${version_parts[0]}.${version_parts[1]}"
     echo "##vso[task.setvariable variable=pluginPatchVersion;isoutput=true]$version_parts[2]"
   displayName: 'Get Version'
-  workingDirectory: 's/plugins/$(pluginName)'
+  workingDirectory: 'plugins/$(pluginName)'
 - task: UseNode@1
   inputs:
     version: '18.19.1'
@@ -63,7 +63,7 @@ steps:
       echo email=$npm_config_email >> .npmrc;
     fi
   displayName: 'Provide npm login'
-  workingDirectory: 's/plugins/$(pluginName)'
+  workingDirectory: 'plugins/$(pluginName)'
 - script: |
     npm install -g yarn
   displayName: 'Install yarn'
@@ -72,7 +72,7 @@ steps:
     git config --global user.email "git@germanedge.com"
     git config --global user.name "Continuous Integration"  
   displayName: 'git config'
-  workingDirectory: 's/plugins/$(pluginName)'
+  workingDirectory: 'plugins/$(pluginName)'
   name: set_git_config
 - script: |
     set -e
@@ -101,7 +101,7 @@ steps:
     # set variable to stop build
     echo "##vso[task.setvariable variable=breakBuild;isOutput=true]true"
   displayName: Set build version
-  workingDirectory: 's/plugins/$(pluginName)'
+  workingDirectory: 'plugins/$(pluginName)'
 - script: |
     yarn kbn bootstrap
   displayName: 'Bootstrap kibana'
@@ -109,12 +109,12 @@ steps:
     yarn install
     yarn build
   displayName: 'Build plugin'
-  workingDirectory: 's/plugins/$(pluginName)'
+  workingDirectory: 'plugins/$(pluginName)'
 - script: |
     git tag "v$(pluginVersion)"
     git push origin
   displayName: 'git add release tag and push'
-  workingDirectory: 's/plugins/$(pluginName)'
+  workingDirectory: 'plugins/$(pluginName)'
 - script: |
     cd plugins/$(pluginName)
     # run predefined script
