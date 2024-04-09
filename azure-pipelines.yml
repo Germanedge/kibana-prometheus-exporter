@@ -106,7 +106,7 @@ steps:
     yarn kbn bootstrap
   displayName: 'Set up Kibana Development Environment'
 - script: |
-    yarn build
+    yarn build --kibana-version $(kibanaBaseVersion)
   displayName: 'Build plugin'
   workingDirectory: 'plugins/$(pluginName)'
   env:
