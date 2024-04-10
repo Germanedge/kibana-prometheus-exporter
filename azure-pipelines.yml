@@ -130,14 +130,14 @@ steps:
   displayName: Create release nodes
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
-    git tag "v$(pluginVersion)"
-    git push origin HEAD:develop
+    git tag v$(pluginVersion)
+    git push origin v$(pluginVersion)
   displayName: 'git add release tag and push'
   workingDirectory: 'plugins/$(pluginName)'
   condition: and(eq(variables['Build.SourceBranchName'], 'develop'), eq(variables.draftFlag, false))
 - script: |
-    git tag "v$(pluginVersion)"
-    git push origin HEAD:$(Build.SourceBranch)
+    git tag v$(pluginVersion)
+    git push origin v$(pluginVersion)
   displayName: 'git add draft release tag and push'
   workingDirectory: 'plugins/$(pluginName)'
   condition: eq(variables.draftFlag, true)
