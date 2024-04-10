@@ -119,19 +119,20 @@ steps:
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
     # run predefined script
-    ../utils/checksum ./build/*.zip > checksum.json
+    ./utils/checksum ./build/*.zip > checksum.json
   displayName: Create checksum manifest
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
     # run predefined script
     cp ./utils/RELEASE_TEMPLATE.md ./build && ./utils/create_release_template ./build/RELEASE_TEMPLATE.md
-  displayName: Create checksum manifest
+  displayName: Create release nodes
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
     git tag "v$(pluginVersion)"
-    git push origin
+    git push origin HEAD:develop
   displayName: 'git add release tag and push'
   workingDirectory: 'plugins/$(pluginName)'
+  condition: eq(variables['Build.SourceBranchName'], 'develop')
 - task: GithubRelease@1
   inputs:
     githubConnection: Github EdgeOne
