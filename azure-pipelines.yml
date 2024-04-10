@@ -112,13 +112,14 @@ steps:
   env:
     KIBANA_CI_STATS_CONFIG: '{}'
 - script: |
-    git tag "v$(pluginVersion)"
-    git push origin
-  displayName: 'git add release tag and push'
+    if  [ $(Build.SourceBranch) == 'develop' ]; then
+      echo "##vso[task.setvariable variable=draftFlag;isOutput=true]false"
+    fi
+  displayName: 'Check if draft release'
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
     # run predefined script
-    ../utils/checksum ./build/*.zip >checksum.json
+    ../utils/checksum ./build/*.zip > checksum.json
   displayName: Create checksum manifest
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
@@ -127,10 +128,9 @@ steps:
   displayName: Create checksum manifest
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
-    if  [ $(Build.SourceBranch) == 'develop' ]; then
-      echo "##vso[task.setvariable variable=draftFlag;isOutput=true]false"
-    fi
-  displayName: 'Check if draft release'
+    git tag "v$(pluginVersion)"
+    git push origin
+  displayName: 'git add release tag and push'
   workingDirectory: 'plugins/$(pluginName)'
 - task: GithubRelease@1
   inputs:
