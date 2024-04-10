@@ -1,6 +1,6 @@
 {
   "name": "kibana-prometheus-exporter",
-  "version": "8.12.2",
+  "version": "",
   "private": true,
   "scripts": {
     "build": "yarn plugin-helpers build",
