@@ -47,10 +47,10 @@ steps:
      echo "##[debug] Get plugin version $plugin_version"
     # Set the values as output variables.
     echo "##vso[task.setvariable variable=pluginVersion;isoutput=true]$plugin_version"
-    echo "##[debug] Set plugin version to ${{varibles.pluginVersion}}"
+    echo "##[debug] Set plugin version to ${{variables.pluginVersion}}"
     echo "##vso[task.setvariable variable=kibanaBaseVersion;isoutput=true]${version_parts[0]}.${version_parts[1]}"
     echo "##vso[task.setvariable variable=pluginPatchVersion;isoutput=true]$version_parts[2]"
-    echo "##[debug] Set kibana version to ${{varibles.kibanaBaseVersion}}"
+    echo "##[debug] Set kibana version to ${{variables.kibanaBaseVersion}}"
   displayName: 'Get Version'
   workingDirectory: 'plugins/$(pluginName)'
 - task: UseNode@1
@@ -95,11 +95,11 @@ steps:
       git add $filename
     }
 
-    echo "##[debug] Setting version to ${{varibles.pluginVersion}}"
-    update_version service.json ${{varibles.pluginVersion}}
-    update_version package.json ${{varibles.pluginVersion}}
+    echo "##[debug] Setting version to ${{variables.pluginVersion}}"
+    update_version service.json ${{variables.pluginVersion}}
+    update_version package.json ${{variables.pluginVersion}}
 
-    git commit -m "CI: Set build version to ${{varibles.pluginVersion}} [+semver: skip]"
+    git commit -m "CI: Set build version to ${{variables.pluginVersion}} [+semver: skip]"
   displayName: Set build version
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
@@ -114,8 +114,8 @@ steps:
 - script: |
     if  [ $(Build.SourceBranch) == 'develop' ]; then
       echo "##vso[task.setvariable variable=draftFlag;isOutput=true]false"
-      echo "##vso[task.setvariable variable=pluginVersion;isoutput=true]${{varibles.pluginVersion}}-draft"
-      echo "##[debug] Set build as draft release: ${{varibles.pluginVersion}}"
+      echo "##vso[task.setvariable variable=pluginVersion;isoutput=true]${{variables.pluginVersion}}-draft"
+      echo "##[debug] Set build as draft release: ${{variables.pluginVersion}}"
     fi
   displayName: 'Check if draft release'
   workingDirectory: 'plugins/$(pluginName)'
@@ -130,13 +130,13 @@ steps:
   displayName: Create release nodes
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
-    git tag "v${{varibles.pluginVersion}}"
-    git push origin "v${{varibles.pluginVersion}}"
+    git tag "v${{variables.pluginVersion}}"
+    git push origin "v${{variables.pluginVersion}}"
   displayName: 'git add release tag and push'
   workingDirectory: 'plugins/$(pluginName)'
   condition: and(eq(variables['Build.SourceBranchName'], 'develop'), eq(variables.draftFlag, false))
 - script: |
-    tag_key="v${{varibles.pluginVersion}}"
+    tag_key="v${{variables.pluginVersion}}"
     echo "##[debug] Create tag ${tag_key} in github"
     git tag "${tag_key}"
     git push origin "${tag_key}"
