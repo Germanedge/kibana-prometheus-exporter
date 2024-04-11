@@ -130,14 +130,14 @@ steps:
   displayName: Create release nodes
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
-    git tag v$(pluginVersion)
-    git push origin v$(pluginVersion)
+    git tag "v$(pluginVersion)"
+    git push origin "v$(pluginVersion)"
   displayName: 'git add release tag and push'
   workingDirectory: 'plugins/$(pluginName)'
   condition: and(eq(variables['Build.SourceBranchName'], 'develop'), eq(variables.draftFlag, false))
 - script: |
-    git tag v$(pluginVersion)
-    git push origin v$(pluginVersion)
+    git tag "v$(pluginVersion)"
+    git push origin "v$(pluginVersion)"
   displayName: 'git add draft release tag and push'
   workingDirectory: 'plugins/$(pluginName)'
   condition: eq(variables.draftFlag, true)
@@ -147,9 +147,9 @@ steps:
     repositoryName: '$(Build.Repository.Name)'
     action: 'create'
     tagSource: 'userSpecifiedTag'
-    tag: $(pluginVersion)
+    tag: 'v$(variables.pluginVersion)'
     releaseNotesSource: 'filePath'
-    releaseNotesFilePath : 'CHANGELOG.md'
+    releaseNotesFilePath : 'release_notes.md'
     assets: '$(PWD)/plugins/kibana-prometheus-exporter/build/*'
     isDraft: $(draftFlag)
-  displayName: 'Create GitHub Release'
+  displayName: 'Create GitHub (draft) Release'
