@@ -35,7 +35,6 @@ steps:
   path: s/plugins/$(pluginName)
   persistCredentials: true
 - script: |
-    ls -la
     # Parse the Json file and get the values.
     plugin_version=$(cat kibana.json | jq -r '.version')
     # split version to get kibana version and patch level
@@ -45,12 +44,13 @@ steps:
       echo "##[error] Version must have 3 parts, found ${#version_parts[@]}"
       exit 1
      fi
-    echo "##[debug] Get plugin version $plugin_version"
+     echo "##[debug] Get plugin version $plugin_version"
     # Set the values as output variables.
     echo "##vso[task.setvariable variable=pluginVersion;isoutput=true]$plugin_version"
-    echo "##[debug] Set kibana version to ${version_parts[0]}.${version_parts[1]}"
+    echo "##[debug] Set plugin version to ${{varibles.pluginVersion}}"
     echo "##vso[task.setvariable variable=kibanaBaseVersion;isoutput=true]${version_parts[0]}.${version_parts[1]}"
     echo "##vso[task.setvariable variable=pluginPatchVersion;isoutput=true]$version_parts[2]"
+    echo "##[debug] Set kibana version to ${{varibles.kibanaBaseVersion}}"
   displayName: 'Get Version'
   workingDirectory: 'plugins/$(pluginName)'
 - task: UseNode@1
@@ -79,7 +79,7 @@ steps:
 - script: |
     set -e
     service_version=$(jq -r ".version" service.json)
-    if [[ "$service_version" == "$(pluginVersion)" ]]; 
+    if [[ "$service_version" == "${{variables.pluginVersion}}" ]]; 
     then
         echo "File service.json contains correct version. Exiting."
         exit 0            
@@ -95,11 +95,11 @@ steps:
       git add $filename
     }
 
-    echo "##[debug] setting version to $(pluginVersion)"
-    update_version service.json $(pluginVersion)
-    update_version package.json $(pluginVersion)
+    echo "##[debug] Setting version to ${{varibles.pluginVersion}}"
+    update_version service.json ${{varibles.pluginVersion}}
+    update_version package.json ${{varibles.pluginVersion}}
 
-    git commit -m "CI: Set build version to $(pluginVersion) [+semver: skip]"
+    git commit -m "CI: Set build version to ${{varibles.pluginVersion}} [+semver: skip]"
   displayName: Set build version
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
@@ -114,8 +114,8 @@ steps:
 - script: |
     if  [ $(Build.SourceBranch) == 'develop' ]; then
       echo "##vso[task.setvariable variable=draftFlag;isOutput=true]false"
-      echo "##vso[task.setvariable variable=pluginVersion;isoutput=true]$(pluginVersion)-draft"
-      echo "Set build as draft release: $(pluginVersion)"
+      echo "##vso[task.setvariable variable=pluginVersion;isoutput=true]${{varibles.pluginVersion}}-draft"
+      echo "##[debug] Set build as draft release: ${{varibles.pluginVersion}}"
     fi
   displayName: 'Check if draft release'
   workingDirectory: 'plugins/$(pluginName)'
@@ -130,14 +130,16 @@ steps:
   displayName: Create release nodes
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
-    git tag "v$(pluginVersion)"
-    git push origin "v$(pluginVersion)"
+    git tag "v${{varibles.pluginVersion}}"
+    git push origin "v${{varibles.pluginVersion}}"
   displayName: 'git add release tag and push'
   workingDirectory: 'plugins/$(pluginName)'
   condition: and(eq(variables['Build.SourceBranchName'], 'develop'), eq(variables.draftFlag, false))
 - script: |
-    git tag "v$(pluginVersion)"
-    git push origin "v$(pluginVersion)"
+    tag_key="v${{varibles.pluginVersion}}"
+    echo "##[debug] Create tag ${tag_key} in github"
+    git tag "${tag_key}"
+    git push origin "${tag_key}"
   displayName: 'git add draft release tag and push'
   workingDirectory: 'plugins/$(pluginName)'
   condition: eq(variables.draftFlag, true)
@@ -149,7 +151,7 @@ steps:
     tagSource: 'userSpecifiedTag'
     tag: 'v$(variables.pluginVersion)'
     releaseNotesSource: 'filePath'
-    releaseNotesFilePath : 'release_notes.md'
+    releaseNotesFilePath : 'CHANGELOG.md'
     assets: '$(PWD)/plugins/kibana-prometheus-exporter/build/*'
     isDraft: $(draftFlag)
   displayName: 'Create GitHub (draft) Release'
