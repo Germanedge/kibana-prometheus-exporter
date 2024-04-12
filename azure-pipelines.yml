@@ -46,7 +46,7 @@ steps:
      fi
      echo "##[debug] Get plugin version $plugin_version"
     # Set the values as output variables.
-    echo "##vso[task.setvariable variable=pluginVersion;isoutput=true]$p{lugin_version}"
+    echo "##vso[task.setvariable variable=pluginVersion;isoutput=true]${plugin_version}"
     echo "##[debug] Set plugin version to ${{variables.pluginVersion}}"
     echo "##vso[task.setvariable variable=kibanaBaseVersion;isoutput=true]${version_parts[0]}.${version_parts[1]}"
     echo "##vso[task.setvariable variable=pluginPatchVersion;isoutput=true]$version_parts[2]"
