@@ -126,7 +126,7 @@ steps:
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
     # run predefined script
-    cp ./utils/RELEASE_TEMPLATE.md ./build && ./utils/create_release_template ./build/RELEASE_TEMPLATE.md
+    cp ./utils/RELEASE_TEMPLATE.md ./build && ./utils/create_release_template ./build/RELEASE_NOTES.md
   displayName: Create release nodes
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
@@ -151,7 +151,7 @@ steps:
     tagSource: 'userSpecifiedTag'
     tag: 'v$(variables.pluginVersion)'
     releaseNotesSource: 'filePath'
-    releaseNotesFilePath : 'CHANGELOG.md'
+    releaseNotesFilePath : '$(PWD)/plugins/kibana-prometheus-exporter/build/RELEASE_NOTES.md'
     assets: '$(PWD)/plugins/kibana-prometheus-exporter/build/*'
     isDraft: $(draftFlag)
   displayName: 'Create GitHub (draft) Release'
