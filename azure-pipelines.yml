@@ -44,9 +44,9 @@ steps:
       echo "##[error] Version must have 3 parts, found ${#version_parts[@]}"
       exit 1
      fi
-     echo "##[debug] Get plugin version $plugin_version"
+     echo "##[debug] Get build version $plugin_version"
     # Set the values as output variables.
-    echo "##vso[task.setvariable variable=pluginVersion;isoutput=true]${plugin_version}"
+    echo "##vso[task.setvariable variable=pluginVersion;isoutput=true]$plugin_version"
     echo "##[debug] Set plugin version to ${{variables.pluginVersion}}"
     echo "##vso[task.setvariable variable=kibanaBaseVersion;isoutput=true]${version_parts[0]}.${version_parts[1]}"
     echo "##vso[task.setvariable variable=pluginPatchVersion;isoutput=true]${version_parts[2]}"
@@ -126,7 +126,7 @@ steps:
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
     # run predefined script
-    cp ./utils/RELEASE_TEMPLATE.md ./build && ./utils/create_release_template ./build/RELEASE_NOTES.md
+    cp ./utils/RELEASE_TEMPLATE.md ./build/RELEASE_NOTES.md && ./utils/create_release_template ./build/RELEASE_NOTES.md
   displayName: Create release nodes
   workingDirectory: 'plugins/$(pluginName)'
 - script: |
